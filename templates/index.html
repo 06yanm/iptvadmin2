@@ -1,0 +1,122 @@
+{% extends "template/page.html" %}
+{% load static %}
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block index %}active{% endblock %}
+
+{% block body%}
+<div class="col-sm-6 col-lg-3">
+    <div class="card bg-cyan">
+        <div class="card-body clearfix">
+            <div class="pull-right">
+                <p class="h6 text-white m-t-0">启动次数</p>
+                <p class="h3 text-white m-b-0 fa-1-5x">{{ startCount }}</p>
+            </div>
+            <div class="pull-left"><span class="img-avatar img-avatar-48 bg-translucent"><i
+                    class="mdi mdi-account fa-1-5x"></i></span></div>
+        </div>
+    </div>
+</div>
+<div class="col-sm-6 col-lg-3">
+    <div class="card bg-primary">
+        <div class="card-body clearfix">
+            <div class="pull-right">
+                <p class="h6 text-white m-t-0">设备数量</p>
+                <p class="h3 text-white m-b-0 fa-1-5x">{{ deviceCount }}</p>
+            </div>
+            <div class="pull-left"><span class="img-avatar img-avatar-48 bg-translucent"><i
+                    class="mdi mdi-server fa-1-5x"></i></span></div>
+        </div>
+    </div>
+</div>
+<div class="col-sm-6 col-lg-3">
+    <div class="card bg-info">
+        <div class="card-body clearfix">
+            <div class="pull-right">
+                <p class="h6 text-white m-t-0">分类数量</p>
+                <p class="h3 text-white m-b-0 fa-1-5x">{{ cateCount }}</p>
+            </div>
+            <div class="pull-left"><span class="img-avatar img-avatar-48 bg-translucent"><i
+                    class="mdi mdi-folder-multiple fa-1-5x"></i></span></div>
+        </div>
+    </div>
+</div>
+<div class="col-sm-6 col-lg-3">
+    <div class="card bg-success">
+        <div class="card-body clearfix">
+            <div class="pull-right">
+                <p class="h6 text-white m-t-0">频道数量</p>
+                <p class="h3 text-white m-b-0 fa-1-5x">{{ channelCount }}</p>
+            </div>
+            <div class="pull-left"><span class="img-avatar img-avatar-48 bg-translucent"><i
+                    class="mdi mdi-television-classic fa-1-5x"></i></span></div>
+        </div>
+    </div>
+</div>
+
+<div class="col-lg-6">
+    <div class="card">
+        <div class="card-header">
+            <h4>近7天软件启动次数</h4>
+        </div>
+        <div class="card-body">
+            <div class="chartjs-size-monitor"
+                 style="position: absolute; inset: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;">
+                <div class="chartjs-size-monitor-expand"
+                     style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;">
+                    <div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div>
+                </div>
+                <div class="chartjs-size-monitor-shrink"
+                     style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;">
+                    <div style="position:absolute;width:200%;height:200%;left:0; top:0"></div>
+                </div>
+            </div>
+            <canvas class="js-chartjs-lines chartjs-render-monitor" width="970" height="484"
+                    style="display: block; height: 323px; width: 647px;"></canvas>
+        </div>
+    </div>
+</div>
+<div class="col-lg-6 col-lg-6">
+    <div class="card">
+        <div class="card-header bg-purple">
+            <h4>版本说明</h4>
+        </div>
+        <div class="card-body">
+            <p>Version：2.0.2</p>
+            <p>更新时间：2025-02-10</p>
+            <p>更新内容：</p>
+            <p>修复v2.0.1版本的某些问题;</p>
+            <p>优化后台修改账号密码的逻辑部分.</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{% static 'js/Chart.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function(e) {
+        var $dashChartLinesCnt = jQuery( '.js-chartjs-lines' )[0].getContext( '2d' );
+        var $dashChartLinesData = {
+            labels: ['{{ charts.6.0 }}', '{{ charts.5.0 }}', '{{ charts.4.0 }}', '{{ charts.3.0 }}', '{{ charts.2.0 }}', '{{ charts.1.0 }}', '{{ charts.0.0 }}'],
+            datasets: [
+                {
+                    label: '启动次数',
+                    data: ['{{ charts.6.1 }}', '{{ charts.5.1 }}', '{{ charts.4.1 }}', '{{ charts.3.1 }}', '{{ charts.2.1 }}', '{{ charts.1.1 }}', '{{ charts.0.1 }}'],
+                    borderColor: '#358ed7',
+                    backgroundColor: 'rgba(53, 142, 215, 0.175)',
+                    borderWidth: 1,
+                    fill: false,
+                    lineTension: 0.5
+                }
+            ]
+        };
+        var myLineChart = new Chart($dashChartLinesCnt, {
+            type: 'line',
+            data: $dashChartLinesData,
+        });
+    });
+</script>
+{% endblock %}

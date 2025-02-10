@@ -1,0 +1,334 @@
+{% extends "template/page.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block device %}active{% endblock %}
+
+{% block body%}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-toolbar clearfix">
+                <div class="toolbar-btn-action">
+                    <button class="btn btn-success m-r-5" id="refreshBtn"><i class="mdi mdi-refresh"></i> 刷新</button>
+                    <button class="btn btn-primary m-r-5" id="authBtn"><i class="mdi mdi-plus"></i> 批量授权</button>
+                    <button class="btn btn-danger m-r-5" id="unAuthBtn"><i class="mdi mdi-close"></i> 批量解除授权
+                    </button>
+                    <button class="btn btn-cyan m-r-5" data-toggle="modal" data-target="#changeCategory"><i class="mdi mdi-check"></i> 批量修改可看分类</button>
+                    <div class="modal fade" id="changeCategory" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header" id="myModalLabel">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                    <h4 class="modal-title">批量修改分类</h4>
+                                </div>
+                                <div class="modal-body" id="changeCategoryBody">
+                                    <h4>请选择开放的分类</h4>
+                                    <div class="checkbox-inline">
+                                        {% for cate in cates %}
+                                        <label class="lyear-checkbox checkbox-inline checkbox-primary">
+                                            <input type="checkbox" data-cid="{{ cate.id }}" name="cateIds[]"><span>{{ cate.name }}</span>
+                                        </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                    <button type="button" class="btn btn-success" data-dismiss="modal" id="changeCateBtn">提交修改</button>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="deviceTable">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label class="lyear-checkbox checkbox-primary">
+                                        <input type="checkbox" id="check-all"><span></span>
+                                    </label>
+                                </th>
+                                <th>序号</th>
+                                <th>设备名称</th>
+                                <th>mac地址</th>
+                                <th>设备ID</th>
+                                <th>授权情况</th>
+                                <th>可看分类</th>
+                                <th>启动次数</th>
+                                <th>IP地址</th>
+                                <th>最后上线时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <ul class="pagination" id="pagination"></ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    $(document).ready(function () {
+        var ids = [];
+        var cateIds = [];
+        var totalPages = {{ allPages }};
+        var currentPage = 1;
+
+
+        // 获取所有设备页数
+        function getDevicePageNum() {
+            $.ajax({
+                url: '/api/device/getDevicePageNum',
+                type: 'GET',
+                success: function (response) {
+                    if (response.code == 200) {
+                        totalPages = response.data;
+                    }
+                }
+            });
+        }
+
+        // 刷新按钮
+        $('#refreshBtn').on('click', function () {
+            refreshDeviceList(currentPage);
+            lightyear.notify("刷新成功", 'success', 1000);
+        });
+        // 全选或取消全选
+        $('#check-all').on('change', function () {
+            var isChecked = $(this).is(':checked');
+            $('input[type="checkbox"][name="ids[]"]').prop('checked', isChecked);
+            ids = isChecked ? $('input[type="checkbox"][name="ids[]"]').map(function () {
+                return this.value;
+            }).get() : [];
+        });
+
+        // 数据表单ids登记与解除
+        $('#deviceTable').on('change', 'input[type="checkbox"][name="ids[]"]', function () {
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push(id);
+            } else {
+                var index = ids.indexOf(id);
+                if (index !== -1) {
+                    ids.splice(index, 1);
+                }
+            }
+        });
+        // 批量授权 or 解除授权
+        function doOperations(action) {
+            if (action == '授权') {
+                var url = '/api/device/authByIds';
+            }
+            else if (action == '解除授权') {
+                var url = '/api/device/unAuthByIds';
+            }
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    ids: JSON.stringify(ids)
+                },
+                success: function (response) {
+                    if (response.code == 200) {
+                        refreshDeviceList(currentPage);
+                        lightyear.notify(response.msg, 'success', 2000);
+                    }
+                    else {
+                        lightyear.loading('hide');
+                        lightyear.notify(response.msg, 'danger', 2000);
+                    }
+                },
+                error: function () {
+                    lightyear.loading('hide');
+                    lightyear.notify('网络错误或服务器无响应', 'danger', 2000);
+                }
+            });
+        }
+        // 绑定按钮事件
+        $('#authBtn').on('click', function () {
+            doOperations('授权');
+        });
+        $('#unAuthBtn').on('click', function () {
+            doOperations('解除授权');
+        });
+        // 刷新设备列表
+        function refreshDeviceList(page) {
+            var page = currentPage;
+            lightyear.loading('show');
+            ids = [];
+            cateIds = [];
+            getDevicePageNum();
+            generatePagination(totalPages, currentPage);
+            // 所有checkBox取消勾选
+            $('input[type="checkbox"]').prop('checked', false);
+            $.ajax({
+                url: '/api/device/getDevicesByPage',
+                type: 'GET',
+                data: { "page": page },
+                success: function (response) {
+                    if (response.code == 200) {
+                        // 清空列表
+                        $('#deviceTable tbody').empty();
+                        // 添加数据
+                        response.data.forEach(function (device) {
+                            var authStatus = device.isAuth ? '<font class="text-success">已授权</font>' : '<font class="text-warning">未授权</font>';
+                            var canSee = device.canSee;
+                            formatedDate = formatDate(device.lastTime);
+                            var row = `
+                        <tr>
+                            <td>
+                                <label class="lyear-checkbox checkbox-primary">
+                                    <input type="checkbox" name="ids[]" value="${device.id}"><span></span>
+                                </label>
+                            </td>
+                            <td>${device.num}</td>
+                            <td>${device.deviceName}</td>
+                            <td>${device.mac}</td>
+                            <td>${device.androidId}</td>
+                            <td>${authStatus}</td>
+                            <td>${canSee}</td>
+                            <td>${device.startCount}</td>
+                            <td>${device.ip}</td>
+                            <td>${formatedDate}</td>
+                        </tr>
+                    `;
+                            $('#deviceTable tbody').append(row);
+                        });
+                        lightyear.loading('hide');
+                    }
+                    else {
+                        lightyear.loading('hide');
+                        lightyear.notify("刷新失败：" + response.msg, 'danger', 2000);
+                    }
+                },
+                error: function () {
+                    lightyear.loading('hide');
+                    lightyear.notify('网络错误或服务器无响应', 'danger', 2000);
+                }
+            });
+        }
+        // 日期格式化函数
+        function formatDate(dateString) {
+            return dateString.replace('T', ' ').split('.')[0];
+        }
+
+        // 生成分页符
+        function generatePagination(totalPages, currentPage) {
+            var paginationHtml = '<ul class="pagination">';
+            // 上一页
+            if (currentPage > 1) {
+                paginationHtml += '<li><a href="#" data-page="' + (currentPage - 1) + '">«</a></li>';
+            } else {
+                paginationHtml += '<li class="disabled"><span>«</span></li>';
+            }
+            // 显示页码
+            var startPage = 1;
+            var endPage = totalPages;
+            var maxPagesToShow = 9; // 显示的最大页码数
+            if (totalPages > maxPagesToShow) {
+                var middlePage = Math.floor(maxPagesToShow / 2);
+                startPage = Math.max(currentPage - middlePage, 1);
+                endPage = startPage + maxPagesToShow - 1;
+
+                if (endPage > totalPages) {
+                    endPage = totalPages;
+                    startPage = endPage - maxPagesToShow + 1;
+                }
+            }
+            for (var page = startPage; page <= endPage; page++) {
+                if (page === currentPage) {
+                    paginationHtml += '<li class="active"><span>' + page + '</span></li>';
+                } else {
+                    paginationHtml += '<li><a href="#" data-page="' + page + '">' + page + '</a></li>';
+                }
+            }
+            // 省略号
+            if (startPage > 1) {
+                paginationHtml += '<li class="disabled"><span>...</span></li>';
+            }
+            if (endPage < totalPages) {
+                paginationHtml += '<li class="disabled"><span>...</span></li>';
+            }
+            // 下一页
+            if (currentPage < totalPages) {
+                paginationHtml += '<li><a href="#" data-page="' + (currentPage + 1) + '">»</a></li>';
+            } else {
+                paginationHtml += '<li class="disabled"><span>»</span></li>';
+            }
+            paginationHtml += '</ul>';
+            $('#pagination').html(paginationHtml);
+        }
+         generatePagination(totalPages, currentPage);
+        // 点击分页链接
+        $(document).on('click', '.pagination a', function (e) {
+            e.preventDefault();
+            var page = $(this).data('page');
+            currentPage = page;
+            refreshDeviceList(page); // 调用函数刷新设备列表
+            $('.pagination-container').html(generatePagination(totalPages, currentPage)); // 重新生成分页控件
+        });
+        // 绑定分页点击事件
+        $('#pagination').on('click', 'a[data-page]', function(e) {
+            e.preventDefault();
+            var page = parseInt($(this).data('page'));
+            if (!$(this).parent().hasClass('disabled') && !$(this).parent().hasClass('active')) {
+                currentPage = page;
+                refreshDeviceList(page);
+                generatePagination(totalPages, currentPage);
+            }
+        });
+        // cateIds登记与解除
+        $('#changeCategoryBody').on('change', 'input[type="checkbox"][name="cateIds[]"]', function () {
+            var cateid = $(this).data('cid');
+            if ($(this).is(':checked')) {
+                cateIds.push(cateid);
+            } else {
+                var index = cateIds.indexOf(cateid);
+                if (index !== -1) {
+                    cateIds.splice(index, 1);
+                }
+            }
+        });
+        // 修改分类
+        $('#changeCateBtn').on('click', function () {
+            lightyear.loading('show');
+            $.ajax({
+                url: '/api/device/changeCateMany',
+                type: 'POST',
+                data: {
+                    'cateIds': JSON.stringify(cateIds),
+                    'device': JSON.stringify(ids)
+                },
+                success: function (response) {
+                    if (response.code == 200) {
+                        lightyear.loading('hide');
+                        lightyear.notify(response.msg, 'success', 2000);
+                        refreshDeviceList(currentPage);
+                    }
+                    else {
+                        lightyear.loading('hide');
+                        lightyear.notify(response.msg, 'warning', 2000);
+                        refreshDeviceList(currentPage);
+                    }
+                },
+                error: function() {
+                    lightyear.loading('hide');
+                    lightyear.notify('网络错误或服务器无响应', 'danger', 2000);
+                    refreshDeviceList(currentPage);
+                }
+            });
+
+        });
+        refreshDeviceList(currentPage);
+    });
+</script>
+{% endblock %}

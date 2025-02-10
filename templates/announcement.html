@@ -1,0 +1,79 @@
+{% extends "template/page.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block soft %}open{% endblock %}
+{% block announcement %}active{% endblock %}
+
+{% block body%}
+<div class="col-md-6">
+    <div class="card">
+        <div class="card-header"><h4>修改</h4></div>
+        <div class="card-body">
+            <form>
+                <div class="form-group">
+                    <label>修改后内容</label>
+                    <textarea class="form-control" id="ggcontent" name="content"
+                              placeholder="请输入公告"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>显示时长</label>
+                    <input class="form-control" id="showtime" name="showtime"
+                              placeholder="请输入时长（秒）"></input>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary" type="submit">确认修改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="col-md-6">
+    <div class="card">
+        <div class="card-header"><h4>当前公告/广告</h4></div>
+        <div class="card-body">
+                <div class="form-group">
+                    <textarea disabled class="form-control"
+                              >{{ content }}</textarea>
+                </div>
+            <div class="form-group">
+                    <label>显示时长</label>
+                    <input disabled class="form-control" value="{{ showtime }}"
+                              ></input>
+                </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    $(document).ready(function (e) {
+        $("form").on("submit", function(event) {
+            event.preventDefault();
+            lightyear.loading('show');
+            $.ajax({
+                url: "/api/soft/announcement",
+                type: "POST",
+                data: $(this).serialize(),
+                success: function (response) {
+                    if (response.code == 200) {
+                        lightyear.notify(response.msg, 'success', 2000);
+                        window.location.reload();
+                    } else {
+                        lightyear.loading('hide');
+                        lightyear.notify(response.msg, 'danger', 2000);
+                    }
+                },
+                error: function () {
+                    lightyear.loading('hide');
+                    lightyear.notify('网络错误或服务器无响应', 'danger', 2000);
+                }
+            });
+        });
+    });
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,477 @@
+{% extends "template/page.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block soft %}open{% endblock %}
+{% block channel %}active{% endblock %}
+
+{% block body%}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-toolbar clearfix">
+                <div class="toolbar-btn-action">
+                    <button class="btn btn-success m-r-5" id="refreshBtn"><i class="mdi mdi-refresh"></i> 刷新</button>
+                    <button class="btn btn-primary m-r-5" id="addCateBtn" data-toggle="modal" data-target="#addChannel">
+                        <i class="mdi mdi-plus"></i> 新建频道
+                    </button>
+                    <button class="btn btn-danger m-r-5" id="delManyBtn"><i class="mdi mdi-close"></i> 批量删除</button>
+                    <button class="btn btn-purple m-r-5 updown" data-cz="sj"><i class="mdi mdi-package-variant"></i>
+                        批量上架
+                    </button>
+                    <button class="btn btn-warning m-r-5 updown" data-cz="xj"><i class="mdi mdi-package-variant"></i>
+                        批量下架
+                    </button>
+
+                    <div class="modal fade" id="addChannel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header" id="myModalLabel">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                            aria-hidden="true">×</span></button>
+                                    <h4 class="modal-title">新建频道</h4>
+                                </div>
+                                <div class="modal-body" id="addChannelBody">
+                                    <form id="addChannelForm">
+                                        <div class="form-group">
+                                            <label for="addname">频道名称</label>
+                                            <input type="text" class="form-control" id="addname" name="addname"
+                                                   placeholder="请输入频道名称">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="adddesc">频道备注</label>
+                                            <textarea class="form-control" id="adddesc" name="adddesc"
+                                                      placeholder="请输入频道备注，可空"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="addcate">所属分类</label>
+                                            <select class="form-control" id="addcate" name="addcate"
+                                                    size="1">
+                                                <option value="0">请选择</option>
+                                                {% for cate in cates %}
+                                                <option value="{{ cate.id }}">{{ cate.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="addurl">播放地址</label>
+                                            <textarea class="form-control" id="addurl" name="addurl"
+                                                      placeholder="请输入播放地址..."></textarea>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                    <button type="button" class="btn btn-success" data-dismiss="modal"
+                                            id="addChannelSubBtn">提交
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="editChannel" tabindex="-1" role="dialog"
+                         aria-labelledby="emyModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header" id="emyModalLabel">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                            aria-hidden="true">×</span></button>
+                                    <h4 class="modal-title">编辑分类</h4>
+                                </div>
+                                <div class="modal-body" id="editChannelBody">
+                                    <form id="editChannelForm">
+                                        <div class="form-group">
+                                            <label for="ename">频道名称</label>
+                                            <input type="text" class="form-control" id="ename" name="ename"
+                                                   placeholder="请输入频道名称">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edesc">频道备注</label>
+                                            <textarea class="form-control" id="edesc" name="edesc"
+                                                      placeholder="请输入频道备注，可空"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="ecate">所属分类</label>
+                                            <select class="form-control" id="ecate" name="ecate"
+                                                    size="1">
+                                                <option value="0">请选择</option>
+                                                {% for cate in cates %}
+                                                <option value="{{ cate.id }}">{{ cate.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label >上架状态</label>
+                                            <div class="clearfix">
+                                                <label class="lyear-radio radio-inline radio-primary">
+                                                    <input type="radio" class="dx" name="ehidden" value="0"><span>下架</span>
+                                                </label>
+                                                <label class="lyear-radio radio-inline radio-primary">
+                                                    <input type="radio" class="dx" name="ehidden" value="1" checked=""><span>上架</span>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="eurl">播放地址</label>
+                                            <textarea class="form-control" id="eurl" name="eurl"
+                                                      placeholder="请输入播放地址..."></textarea>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                    <button type="button" class="btn btn-success" data-dismiss="modal"
+                                            id="editChannelSubBtn">确认修改
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="channelTable">
+                        <thead>
+                        <tr>
+                            <th>
+                                <label class="lyear-checkbox checkbox-primary">
+                                    <input type="checkbox" id="check-all"><span></span>
+                                </label>
+                            </th>
+                            <th>序号</th>
+                            <th>频道名称</th>
+                            <th>频道备注</th>
+                            <th>节目状态</th>
+                            <th>所属分类</th>
+                            <th>播放地址</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <ul class="pagination" id="pagination"></ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+
+</script>
+<script>
+    var okbutton = 0;
+    // 编辑分类
+    function editFunction(id) {
+         nowId = id;
+         $('#ename').val($('#chname' + nowId).text());
+         $('#edesc').val($('#chdesc' + nowId).text());
+         $('#eurl').val($('#churl' + nowId).text());
+    }
+</script>
+<script>
+    var ids = [];
+        var totalPages = {{ allPages }};
+        var currentPage = 1;
+        var nowId = -1;
+    $(document).ready(function () {
+
+    $(".dx").click(function() {
+        // 获取被选中的单选按钮的值
+        var selectedValue = $('input[name="ehidden"]:checked').val();
+        // 输出选中的值
+        okbutton = selectedValue;
+    });
+
+    $('.updown').on('click', function () {
+        var cz = $(this).data('cz');
+        updown(cz);
+    });
+
+    // 批量上下架
+    function updown(cz) {
+        $.ajax({
+            url: '/api/soft/showChannel',
+            type: 'POST',
+            data: {
+                ids: JSON.stringify(ids),
+                cz: cz
+            },
+            success: function (response) {
+                if (response.code == 200) {
+                    lightyear.notify(response.msg, 'success', 2000);
+                    refreshDeviceList(currentPage);
+                } else {
+                    lightyear.notify(response.msg, 'danger', 2000);
+                    refreshDeviceList(currentPage);
+                }
+            },
+            error: function () {
+                lightyear.notify('网络错误或服务器无响应', 'danger', 2000);
+                refreshDeviceList(currentPage);
+            },
+        });
+    }
+        var nowCateId = -1;
+        $('#editChannelSubBtn').on('click', function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: '/api/soft/editChannel',
+                type: 'POST',
+                data: {
+                    eid: nowId,
+                    ename: $('#ename').val(),
+                    edesc: $('#edesc').val(),
+                    eurl: $('#eurl').val(),
+                    ehidden: okbutton,
+                    ecid: $('#ecate').val()
+                },
+                success: function (response) {
+                    if (response.code == 200) {
+                        lightyear.notify(response.msg, 'success', 2000);
+                        refreshDeviceList(currentPage);
+                   } else {
+                        lightyear.notify(response.msg, 'danger', 2000);
+                        refreshDeviceList(currentPage);
+                   }
+                },
+                error: function() {
+                    lightyear.notify("网络错误或服务器无响应", 'danger', 2000);
+                    refreshDeviceList(currentPage);
+                },
+            });
+        });
+
+        // 获取所有分类页数
+        function getChannelPageNum() {
+            $.ajax({
+                url: '/api/soft/getChannelPageNum',
+                type: 'GET',
+                success: function (response) {
+                    if (response.code == 200) {
+                        totalPages = response.data;
+                    }
+                }
+            });
+        }
+
+        // 刷新按钮
+        $('#refreshBtn').on('click', function () {
+            refreshDeviceList(currentPage);
+            lightyear.notify("刷新成功", 'success', 1000);
+        });
+        // 全选或取消全选
+        $('#check-all').on('change', function () {
+            var isChecked = $(this).is(':checked');
+            $('input[type="checkbox"][name="ids[]"]').prop('checked', isChecked);
+            ids = isChecked ? $('input[type="checkbox"][name="ids[]"]').map(function () {
+                return this.value;
+            }).get() : [];
+        });
+
+        // 数据表单ids登记与解除
+        $('#channelTable').on('change', 'input[type="checkbox"][name="ids[]"]', function () {
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push(id);
+            } else {
+                var index = ids.indexOf(id);
+                if (index !== -1) {
+                    ids.splice(index, 1);
+                }
+            }
+        });
+        // 刷新分类列表
+        function refreshDeviceList(page) {
+            var page = currentPage;
+            lightyear.loading('show');
+            ids = [];
+            getChannelPageNum();
+            generatePagination(totalPages, currentPage);
+            // 所有checkBox取消勾选
+            $('input[type="checkbox"]').prop('checked', false);
+            $.ajax({
+                url: '/api/soft/getChannelByPage',
+                type: 'GET',
+                data: { "page": page },
+                success: function (response) {
+                    if (response.code == 200) {
+                        // 清空列表
+                        $('#channelTable tbody').empty();
+                        // 添加数据
+                        response.data.forEach(function (channel) {
+                        var status = channel.status ? '<font class="text-warning">下架</font>' : '<font class="text-success">上架</font>';
+                            var row = `
+                        <tr>
+                            <td>
+                                <label class="lyear-checkbox checkbox-primary">
+                                    <input type="checkbox" name="ids[]" value="${channel.id}"><span></span>
+                                </label>
+                            </td>
+                            <td>${channel.num}</td>
+                            <td id="chname${channel.id}">${channel.name}</td>
+                            <td id="chdesc${channel.id}">${channel.desc}</td>
+                            <td id="chhidden${channel.id}">${status}</td>
+                            <td id="chate${channel.id}">${channel.cate}</td>
+                            <td id="churl${channel.id}">${channel.url}</td>
+                            <td>
+                          <div class="btn-group">
+                            <a class="btn btn-xs btn-default" data-toggle="modal" data-target="#editChannel" onclick="editFunction(${channel.id})" data-original-title="编辑"><i class="mdi mdi-pencil"></i></a>
+                          </div>
+                        </td>
+                        </tr>
+                    `;
+                            $('#channelTable tbody').append(row);
+                        });
+                        lightyear.loading('hide');
+                    }
+                    else {
+                        lightyear.loading('hide');
+                        lightyear.notify("刷新失败：" + response.msg, 'danger', 2000);
+                    }
+                },
+                error: function () {
+                    lightyear.loading('hide');
+                    lightyear.notify('网络错误或服务器无响应', 'danger', 2000);
+                }
+            });
+        }
+
+        // 生成分页符
+        function generatePagination(totalPages, currentPage) {
+            var paginationHtml = '<ul class="pagination">';
+            // 上一页
+            if (currentPage > 1) {
+                paginationHtml += '<li><a href="#" data-page="' + (currentPage - 1) + '">«</a></li>';
+            } else {
+                paginationHtml += '<li class="disabled"><span>«</span></li>';
+            }
+            // 显示页码
+            var startPage = 1;
+            var endPage = totalPages;
+            var maxPagesToShow = 9; // 显示的最大页码数
+            if (totalPages > maxPagesToShow) {
+                var middlePage = Math.floor(maxPagesToShow / 2);
+                startPage = Math.max(currentPage - middlePage, 1);
+                endPage = startPage + maxPagesToShow - 1;
+
+                if (endPage > totalPages) {
+                    endPage = totalPages;
+                    startPage = endPage - maxPagesToShow + 1;
+                }
+            }
+            for (var page = startPage; page <= endPage; page++) {
+                if (page === currentPage) {
+                    paginationHtml += '<li class="active"><span>' + page + '</span></li>';
+                } else {
+                    paginationHtml += '<li><a href="#" data-page="' + page + '">' + page + '</a></li>';
+                }
+            }
+            // 省略号
+            if (startPage > 1) {
+                paginationHtml += '<li class="disabled"><span>...</span></li>';
+            }
+            if (endPage < totalPages) {
+                paginationHtml += '<li class="disabled"><span>...</span></li>';
+            }
+            // 下一页
+            if (currentPage < totalPages) {
+                paginationHtml += '<li><a href="#" data-page="' + (currentPage + 1) + '">»</a></li>';
+            } else {
+                paginationHtml += '<li class="disabled"><span>»</span></li>';
+            }
+            paginationHtml += '</ul>';
+            $('#pagination').html(paginationHtml);
+        }
+         generatePagination(totalPages, currentPage);
+        // 点击分页链接
+        $(document).on('click', '.pagination a', function (e) {
+            e.preventDefault();
+            var page = $(this).data('page');
+            currentPage = page;
+            refreshDeviceList(page); // 调用函数刷新设备列表
+            $('.pagination-container').html(generatePagination(totalPages, currentPage)); // 重新生成分页控件
+        });
+        // 绑定分页点击事件
+        $('#pagination').on('click', 'a[data-page]', function(e) {
+            e.preventDefault();
+            var page = parseInt($(this).data('page'));
+            if (!$(this).parent().hasClass('disabled') && !$(this).parent().hasClass('active')) {
+                currentPage = page;
+                refreshDeviceList(page);
+                generatePagination(totalPages, currentPage);
+            }
+        });
+        // 添加频道
+        $('#addChannelSubBtn').on('click', function (event) {
+            $.ajax({
+                url: '/api/soft/addChannel',
+                type: 'POST',
+                data: {
+                    addname: $('#addname').val(),
+                    adddesc: $('#adddesc').val(),
+                    addcate: $('#addcate').val(),
+                    addurl: $('#addurl').val(),
+                },
+                success: function (response) {
+                    if (response.code === 200) {
+                        lightyear.notify(response.msg, 'success', 2000);
+                        refreshDeviceList(currentPage);
+                        $('#addname').val("");
+                        $('#adddesc').val("");
+                        $('#addcate').val("");
+                        $('#addurl').val("");
+                    } else {
+                        lightyear.notify(response.msg, 'danger', 2000);
+                        refreshDeviceList(currentPage);
+                        $('#addname').val("");
+                        $('#adddesc').val("");
+                        $('#addcate').val("");
+                        $('#addurl').val("");
+                    }
+                },
+                error: function () {
+                    lightyear.notify("网络错误或服务器无响应", 'danger', 2000);
+                    refreshDeviceList(currentPage);
+                    $('#addname').val("");
+                        $('#adddesc').val("");
+                        $('#addcate').val("");
+                        $('#addurl').val("");
+                },
+            });
+        });
+        // 批量删除频道
+        $('#delManyBtn').on('click', function (event) {
+            $.ajax({
+                url: '/api/soft/deleteChannel',
+                type: 'POST',
+                data: {
+                    "ids":JSON.stringify(ids),
+                },
+                success: function (response) {
+                    if (response.code === 200) {
+                        lightyear.notify(response.msg, 'success', 2000);
+                        refreshDeviceList(currentPage);
+                   } else {
+                        lightyear.notify(response.msg, 'danger', 2000);
+                        refreshDeviceList(currentPage);
+                   }
+                },
+                error: function () {
+                    lightyear.notify("网络错误或服务器无响应", 'danger', 2000);
+                    refreshDeviceList(currentPage);
+                },
+            });
+        });
+        refreshDeviceList(currentPage);
+    });
+</script>
+{% endblock %}
