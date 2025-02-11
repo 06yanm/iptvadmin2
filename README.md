@@ -17,7 +17,7 @@
 
 * 后台首页：
 
-![](readmeimg\Snipaste_2025-02-10_19-43-27.png)
+![](readmeimg/Snipaste_2025-02-10_19-43-27.png)
 
 * 登陆设备管理：
 
