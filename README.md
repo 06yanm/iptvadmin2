@@ -17,37 +17,37 @@
 
 * 后台首页：
 
-![](readmeimg/Snipaste_2025-02-10_19-43-27.png)
+![后台首页](readmeimg/Snipaste_2025-02-10_19-43-27.png)
 
 * 登陆设备管理：
 
-![设备管理](https://p.cldisk.com/star3/origin/172026a1ff1c69e76f173a9b67989baa.png)
+![登陆设备管理](readmeimg/Snipaste_2025-02-10_19-43-34.png)
 
 * 设置EPG接口：
 
-![EPG接口设置](https://p.cldisk.com/star3/origin/a1c9462b1b2a22684d1bb6b2c2af6f1b.png)
+![EPG接口设置](readmeimg/Snipaste_2025-02-10_19-43-41.png)
 
 * 分类管理：
 
-![分类管理](https://p.cldisk.com/star3/origin/9937f0fdb64d0cadb9219133030f1019.png)
+![分类管理](readmeimg/Snipaste_2025-02-10_19-43-46.png)
 
 * 频道管理：
 
-![频道管理](https://p.cldisk.com/star3/origin/0eba0236b0a65ccf1aba572026d52d77.png)
+![频道管理](readmeimg/Snipaste_2025-02-10_19-44-23.png)
 
 * 软件公告设置：
 
-![软件公告设置](https://p.cldisk.com/star3/origin/68de79a0a4b9336e9691e215afff1413.png)
+![软件公告设置](readmeimg/Snipaste_2025-02-10_19-44-28.png)
 
 * 软件启动图/退出出图设置：
 
-![软件启动图设置](https://p.cldisk.com/star3/origin/aa41ac57fe473aedb2324295fbcd4a1a.png)
+![软件启动图设置](readmeimg/Snipaste_2025-02-10_19-44-33.png)
 
-![软件退出图设置](https://p.cldisk.com/star3/origin/d425e542cdca63f94281e948c5070195.png)
+![软件退出图设置](readmeimg/Snipaste_2025-02-10_19-44-40.png)
 
 * 系统设置：
 
-![系统设置](https://p.cldisk.com/star3/origin/a0103b5c150b962010499cf152730f4a.png)
+![系统设置](readmeimg/Snipaste_2025-02-10_19-44-45.png)
 
 
 
