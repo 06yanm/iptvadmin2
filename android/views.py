@@ -112,9 +112,9 @@ def md5_hash(plain_text):
     return md5.hexdigest()
 
 
-def getMiniData():
+def getMiniData(mac):
     miniData = ""
-    allCates = Category.objects.all()
+    allCates = Device.objects.filter(macAddress=mac).first().canSee.all()
     for cate in allCates:
         cateName = cate.name
         miniData = miniData + cateName + ",#genre#\r\n"
@@ -133,12 +133,15 @@ def getlive(request):
     if request.method == 'GET':
         return HttpResponse("")
     elif request.method == 'POST':
+        # 获取mac地址用于区分用户
+        deviceInfo = request.POST.get('data')
+        mac = json.loads(deviceInfo)['mac']
         ttime = int(time.time())
         # print(ttime)
         key = md5_hash(str(ttime)+"AD80F93B542B"+"8b14ecf6ae028f9b6d25fa547eabad85")
         ke = key[13:]
         # print("key:"+ke)
-        f = aes_encrypt(getMiniData(), ke)
+        f = aes_encrypt(getMiniData(mac), ke)
         rawData = binascii.hexlify(f)
         response = HttpResponse(gzip.compress(ke.encode("utf-8")+rawData))
         response['Content-Encoding'] = 'gzip'
