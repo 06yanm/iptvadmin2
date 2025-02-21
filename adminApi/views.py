@@ -21,8 +21,7 @@ def notFound(request, exception=""):
 
 
 def logout(request):
-    if 'logged_in' in request.session:
-        del request.session['logged_in']
+    request.session.flush()
     return HttpResponseRedirect(reverse('login'))
 
 # 修改账号密码
@@ -56,6 +55,7 @@ def loginPage(request):
         if d:
             if d.password == password:
                 request.session['logged_in'] = True
+                request.session.set_expiry(0)
                 return JsonResponse({"code": "200", "msg": "登陆成功", "redirect": "/admin/main"})
             else:
                 return JsonResponse({"code": "400", "msg": "登陆失败: 账号或密码错误", "redirect": ""})
