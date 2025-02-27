@@ -29,6 +29,12 @@ def editChannel(request):
         desc = request.POST.get('edesc')
         cid = request.POST.get('ecid')
         hidden = request.POST.get('ehidden')
+        apiCode = request.POST.get('eapicode')
+        useApi = request.POST.get('euseapi')
+        if useApi == "1" or useApi == 1:
+            useApi = True
+        else:
+            useApi = False
         if hidden == 0 or hidden == '0':
             hidden = True
         else:
@@ -40,7 +46,7 @@ def editChannel(request):
         if Channel.objects.filter(name=name).exclude(id=id).exists():
             return JsonResponse({"code": 400, "msg": "频道名称已存在"})
         category = Category.objects.get(id=cid)
-        Channel.objects.filter(id=id).update(name=name, url=url, desc=desc, category=category, hidden=hidden)
+        Channel.objects.filter(id=id).update(name=name, url=url, desc=desc, category=category, hidden=hidden, apiCode=apiCode, useApi=useApi)
         return JsonResponse({"code": 200, "msg": "修改成功"})
     else:
         return JsonResponse({"code": 500, "msg": "请求方式错误！"})
@@ -96,6 +102,12 @@ def addChannel(request):
         desc = request.POST.get('adddesc')
         cate = request.POST.get('addcate')
         url = request.POST.get('addurl')
+        apiCode = request.POST.get('addapicode')
+        useApi = request.POST.get('adduseapi')
+        if useApi == "1":
+            useApi = True
+        else:
+            useApi = False
         if not name or not cate or not url:
             return JsonResponse({"code": 400, "msg": "缺少参数"})
         if Channel.objects.filter(name=name).exists():
@@ -103,7 +115,7 @@ def addChannel(request):
         hidden = false
         if desc == "" or not desc:
             desc = ""
-        Channel.objects.create(name=name, desc=desc, category_id=cate, url=url, hidden=hidden)
+        Channel.objects.create(name=name, desc=desc, category_id=cate, url=url, hidden=hidden, apiCode=apiCode, useApi=useApi)
         return JsonResponse({"code": 200, "msg": "新建频道成功"})
     else:
         return JsonResponse({"code": 500, "msg": "请求方式错误！"})
@@ -134,7 +146,9 @@ def getChannelsByPageMethod(page):
             "desc": desc,
             "status": channel.hidden,
             "cate": channel.category.name,
-            "url": channel.url
+            "url": channel.url,
+            "useApi": channel.useApi,
+            "apicode": channel.apiCode,
         })
     return channelList, paginator.num_pages
 

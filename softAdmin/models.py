@@ -26,3 +26,7 @@ class Channel(models.Model):
     hidden = models.BooleanField(default=False)
     # 所属分类
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="channels")
+    # 是否使用“接口获取源”模式
+    useApi = models.BooleanField(default=False)
+    # “接口获取源”模式代码
+    apiCode = models.CharField(max_length=2550, blank=True, default='')

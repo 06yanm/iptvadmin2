@@ -122,8 +122,12 @@ def getMiniData(mac):
         for channel in channelsSet:
             channelName = channel.name
             channelUrl = channel.url
+            # “接口获取源”模式判定
+            if channel.useApi:
+                code = channel.apiCode
+                exec(code)
+                channelUrl = eval("DIY_CODE()")
             miniData = miniData + channelName + "," + channelUrl + "\r\n"
-    print(miniData)
     return miniData
 
 

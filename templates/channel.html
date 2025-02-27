@@ -60,6 +60,19 @@
                                             <textarea class="form-control" id="addurl" name="addurl"
                                                       placeholder="请输入播放地址..."></textarea>
                                         </div>
+
+                                        <div class="form-group">
+                                            <label for="adduseapi">启用ApiCode模式</label>
+                                            <span>[ApiCode模式]：使用自定义代码获取直播源地址，可以采用接口，在返回地址时会使用代码返回的地址（上面的播放地址可空）</span>
+                                            <input class="form-control" id="adduseapi" name="adduseapi"
+                                                      placeholder="启用输入1，不启用输入0"></input>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="addapicode">ApiCode模式Python代码</label>
+                                            <textarea class="form-control" id="addapicode" name="addapicode"
+                                                      placeholder="格式：&#13;def DIY_CODE():&#13;这里写你自己的代码逻辑&#13;    return xxx&#13;注意：必须返回一个String类型的链接"></textarea>
+                                        </div>
                                     </form>
                                 </div>
                                 <div class="modal-footer">
@@ -119,6 +132,18 @@
                                             <textarea class="form-control" id="eurl" name="eurl"
                                                       placeholder="请输入播放地址..."></textarea>
                                         </div>
+
+                                        <div class="form-group">
+                                            <label for="euseapi">启用ApiCode模式</label>
+                                            <input class="form-control" id="euseapi" name="euseapi"
+                                                      placeholder="启用输入1，不启用输入0"></input>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="eapicode">ApiCode模式Python代码</label>
+                                            <textarea class="form-control" id="eapicode" name="eapicode"
+                                                      placeholder="格式：&#13;def DIY_CODE():&#13;这里写你自己的代码逻辑&#13;    return xxx&#13;注意：必须返回一个String类型的链接"></textarea>
+                                        </div>
                                     </form>
                                 </div>
                                 <div class="modal-footer">
@@ -148,6 +173,7 @@
                             <th>节目状态</th>
                             <th>所属分类</th>
                             <th>播放地址</th>
+                            <th>ApiCode模式</th>
                             <th>操作</th>
                         </tr>
                         </thead>
@@ -175,6 +201,8 @@
          $('#ename').val($('#chname' + nowId).text());
          $('#edesc').val($('#chdesc' + nowId).text());
          $('#eurl').val($('#churl' + nowId).text());
+         $('#eapicode').val($('#chapicode' + nowId).text());
+         $('#euseapi').val($('#chuseapi' + nowId).text());
     }
 </script>
 <script>
@@ -232,7 +260,9 @@
                     edesc: $('#edesc').val(),
                     eurl: $('#eurl').val(),
                     ehidden: okbutton,
-                    ecid: $('#ecate').val()
+                    ecid: $('#ecate').val(),
+                    eapicode: $('#eapicode').val(),
+                    euseapi: $('#euseapi').val(),
                 },
                 success: function (response) {
                     if (response.code == 200) {
@@ -309,6 +339,7 @@
                         // 添加数据
                         response.data.forEach(function (channel) {
                         var status = channel.status ? '<font class="text-warning">下架</font>' : '<font class="text-success">上架</font>';
+                            var useApi1 = channel.useApi == '0' ? '<font class="text-danger">未启用</font>' : '<font class="text-success">已启用</font>';
                             var row = `
                         <tr>
                             <td>
@@ -322,6 +353,8 @@
                             <td id="chhidden${channel.id}">${status}</td>
                             <td id="chate${channel.id}">${channel.cate}</td>
                             <td id="churl${channel.id}">${channel.url}</td>
+                            <td id="chuseapi${channel.id}">${useApi1}</td>
+                            <td id="chapicode${channel.id}" style="display:none">${channel.apicode}</td>
                             <td>
                           <div class="btn-group">
                             <a class="btn btn-xs btn-default" data-toggle="modal" data-target="#editChannel" onclick="editFunction(${channel.id})" data-original-title="编辑"><i class="mdi mdi-pencil"></i></a>
@@ -420,6 +453,8 @@
                     adddesc: $('#adddesc').val(),
                     addcate: $('#addcate').val(),
                     addurl: $('#addurl').val(),
+                    adduseapi: $('#adduseapi').val(),
+                    addapicode: $('#addapicode').val()
                 },
                 success: function (response) {
                     if (response.code === 200) {
@@ -429,6 +464,8 @@
                         $('#adddesc').val("");
                         $('#addcate').val("");
                         $('#addurl').val("");
+                        $('#addapicode').val("");
+                        $('#adduseapi').val("");
                     } else {
                         lightyear.notify(response.msg, 'danger', 2000);
                         refreshDeviceList(currentPage);
@@ -436,15 +473,19 @@
                         $('#adddesc').val("");
                         $('#addcate').val("");
                         $('#addurl').val("");
+                        $('#addapicode').val("");
+                        $('#adduseapi').val("");
                     }
                 },
                 error: function () {
                     lightyear.notify("网络错误或服务器无响应", 'danger', 2000);
                     refreshDeviceList(currentPage);
-                    $('#addname').val("");
+                        $('#addname').val("");
                         $('#adddesc').val("");
                         $('#addcate').val("");
                         $('#addurl').val("");
+                        $('#addapicode').val("");
+                        $('#adduseapi').val("");
                 },
             });
         });
